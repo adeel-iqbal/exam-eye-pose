@@ -72,6 +72,16 @@ Each flag has a 2-second cooldown per student per action.
   </tr>
 </table>
 
+**Pose Detection Output**
+<table align="center">
+  <tr>
+    <td align="center" width="100%">
+      <img src="assets/Pose.png" alt="Pose Detection" width="100%"/>
+      <br/><sub><b>Left student flagged in red (suspicious behavior), right student clean in green</b></sub>
+    </td>
+  </tr>
+</table>
+
 ---
 
 ## 🎬 Sample Output Videos
