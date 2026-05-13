@@ -12,7 +12,7 @@ Upload an exam surveillance video and ExamEye automatically detects every studen
 
 ## 🎯 Overview
 
-ExamEye is a three-step pipeline: upload a video, run the analysis, get a full monitoring report. YOLO11n-pose detects every person in each frame and returns 17 body keypoints per person. ByteTrack assigns each student a persistent ID so they are tracked reliably across frames. The analyzer then checks each person's keypoints every frame using geometric rules — no confidence guessing, pure position-based logic — and flags behaviors that indicate potential cheating.
+ExamEye is a three-step pipeline: upload a video, run the analysis, get a full monitoring report. YOLO11n-pose detects every person in each frame and returns 17 body keypoints per person. ByteTrack assigns each student a persistent ID so they are tracked reliably across frames. The analyzer then checks each person's keypoints every frame using a combination of confidence scores and geometric rules, and flags behaviors that indicate potential cheating.
 
 The web interface streams live annotated frames to the browser as processing runs. Students are outlined in green when clean and red when flagged. A real-time sidebar shows per-student flag counts and the latest detected action. When processing finishes, a full session report is generated with a downloadable annotated output video.
 
@@ -192,7 +192,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ## 📁 Project Structure
 
 ```
-exam-eye/
+exam-eye-pose/
 │
 ├── backend/
 │   ├── main.py                # FastAPI app, WebSocket processing loop
