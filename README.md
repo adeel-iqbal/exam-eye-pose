@@ -1,6 +1,6 @@
 # 👁️ ExamEye — AI Exam Monitoring System
 
-Upload an exam surveillance video and ExamEye automatically detects every student, tracks them across frames, and flags suspicious behavior like head turns, body rotation, and sudden movement.
+Upload an exam surveillance video and ExamEye detects every student, tracks them across frames, and flags suspicious behavior like head turns, body rotation, and sudden movement.
 
 [![Python](https://img.shields.io/badge/Python-3.12%2B-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688.svg)](https://fastapi.tiangolo.com/)
@@ -12,35 +12,33 @@ Upload an exam surveillance video and ExamEye automatically detects every studen
 
 ## 🎯 Overview
 
-ExamEye is a three-step pipeline: upload a video, run the analysis, get a full monitoring report. YOLO11n-pose detects every person in each frame and returns 17 body keypoints per person. ByteTrack assigns each student a persistent ID so they are tracked reliably across frames. The analyzer then checks each person's keypoints every frame using a combination of confidence scores and geometric rules, and flags behaviors that indicate potential cheating.
-
-The web interface streams live annotated frames to the browser as processing runs. Students are outlined in green when clean and red when flagged. A real-time sidebar shows per-student flag counts and the latest detected action. When processing finishes, a full session report is generated with a downloadable annotated output video.
+ExamEye is a three-step pipeline: upload a video, run the analysis, get a full monitoring report. YOLO11n-pose detects every student and returns 17 body keypoints per person. ByteTrack gives each student a persistent ID across frames. The analyzer checks keypoints every frame using geometric and confidence-based rules and flags suspicious behavior. Live annotated frames stream to the browser during processing. Green skeleton means clean, red means flagged. A session report and downloadable annotated video are generated at the end.
 
 ---
 
 ## ✨ Features
 
-- 🧍 **Pose Detection** — YOLO11n-pose detects every student and returns 17 COCO body keypoints per person per frame
-- 🔁 **Persistent Tracking** — ByteTrack maintains stable student IDs across frames so the same student is never double-counted
-- 🔴 **Live Color Coding** — Skeleton overlay turns red the moment a flag is detected and back to green when behavior is clean
-- 📡 **Live Streaming** — Annotated frames stream to the browser in real time over WebSocket during processing
-- 📋 **Per-Student Sidebar** — Live flag count and last detected action for each student during analysis
-- 🎬 **Annotated Output Video** — Full annotated MP4 saved automatically, downloadable from the report screen
-- 📊 **Session Report** — Total students, total flags, most flagged student, per-student breakdown, and full timestamped event log
-- 🗂️ **Video Management** — Upload, browse, and delete source videos from the UI
+- 🧍 **Pose Detection** — YOLO11n-pose, 17 COCO keypoints per person per frame
+- 🔁 **Persistent Tracking** — ByteTrack keeps stable student IDs across the full video
+- 🔴 **Live Color Coding** — Skeleton turns red on a flag, green when clean
+- 📡 **Live Streaming** — Annotated frames stream to the browser over WebSocket
+- 📋 **Per-Student Sidebar** — Live flag count and last action per student
+- 🎬 **Annotated Output Video** — Full annotated MP4 saved and downloadable
+- 📊 **Session Report** — Total students, total flags, most flagged student, and full event log
+- 🗂️ **Video Management** — Upload, browse, and delete videos from the UI
 
 ---
 
 ## 🚨 What Gets Flagged
 
-| Behavior | How It Is Detected |
+| Behavior | Detection Method |
 |---|---|
-| **Head Turn** | Three independent geometric methods — ear confidence asymmetry, nose offset from ear midpoint, and nose-to-eye distance ratio |
-| **Body Turn** | One shoulder significantly higher than the other (student twisting to talk to a neighbour) |
-| **Looking Up** | Nose rises more than 30 pixels above the ear level line |
-| **Sudden Movement** | Shoulder midpoint rises more than 45 pixels above the student's rolling baseline (standing up or large shift) |
+| **Head Turn** | Ear confidence asymmetry + nose offset from ear midpoint + nose-to-eye distance ratio |
+| **Body Turn** | One shoulder significantly higher than the other |
+| **Looking Up** | Nose more than 30px above the ear level line |
+| **Sudden Movement** | Shoulder midpoint rises more than 45px above the student's rolling baseline |
 
-Each flag has a 2-second cooldown per student — one continuous head turn logs one event, not hundreds.
+Each flag has a 2-second cooldown per student per action.
 
 ---
 
@@ -49,17 +47,17 @@ Each flag has a 2-second cooldown per student — one continuous head turn logs 
 | Step | What Happens |
 |---|---|
 | **1. Upload** | Upload a surveillance video or pick one already on the server |
-| **2. Analyze** | YOLO11n-pose + ByteTrack process every frame; flags stream live to the browser |
+| **2. Analyze** | YOLO11n-pose + ByteTrack process every frame, flags stream live |
 | **3. Report** | Final stats, annotated output video, and full event log |
 
 ### Detection Pipeline
 
-- YOLO11n-pose runs on every frame returning bounding boxes and 17 keypoints (x, y, confidence) per person
+- YOLO11n-pose runs on every frame, returning bounding boxes and 17 keypoints per person
 - ByteTrack assigns each person a persistent track ID for the full video
-- `analyzer.py` runs on each person's keypoints every frame using geometric rules that work purely on position, not on confidence scores alone
-- `StudentTracker` converts per-frame flags into logged events with timestamps, applying a 2-second cooldown per student per action type
-- Student count uses the mode over a 90-frame rolling window to ignore brief spurious extra detections from the tracker
-- Skeleton color is set per-frame: red if any flag is active this frame, green if clean
+- `analyzer.py` checks keypoints every frame and returns a list of active flags
+- `StudentTracker` converts per-frame flags into logged events with a 2-second cooldown
+- Student count uses the mode over a 90-frame rolling window to ignore brief spurious detections
+- Skeleton color is set per frame based on whether any flag is currently active
 
 ---
 
@@ -80,8 +78,8 @@ Each flag has a 2-second cooldown per student — one continuous head turn logs 
 
 GitHub does not support video playback. Download the sample output videos from the links below.
 
-- [Output.mp4](assets/Output.mp4) — 2-student session, head turn and body turn flags annotated in real time
-- [Output2.mp4](assets/Output2.mp4) — Same session, different run showing flag timing and skeleton color switching
+- [Output.mp4](assets/Output.mp4)
+- [Output2.mp4](assets/Output2.mp4)
 
 ---
 
@@ -94,13 +92,13 @@ GitHub does not support video playback. Download the sample output videos from t
 
 ### Backend
 - **FastAPI** — REST API and WebSocket server
-- **imageio / libx264** — Annotated output video encoding
+- **imageio / libx264** — Output video encoding
 - **Python 3.12+**
 
 ### Frontend
-- **Next.js 15** — Three-screen UI flow (upload, processing, report)
+- **Next.js 15** — Three-screen UI (upload, processing, report)
 - **Tailwind CSS** — Dark clinical theme
-- **WebSocket** — Live frame and event streaming from backend to browser
+- **WebSocket** — Live frame and event streaming
 
 ---
 
@@ -131,18 +129,18 @@ source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install --prefer-binary -r requirements.txt
 ```
 
-> Note: Use `--prefer-binary` to avoid building OpenCV from source. Tested on Python 3.12 with numpy 1.26.4.
+> Use `--prefer-binary` to avoid building OpenCV from source. Tested on Python 3.12 with numpy 1.26.4.
 
 4. **Model weights**
 
-`yolo11n-pose.pt` downloads automatically from Ultralytics on first run. No manual download needed.
+`yolo11n-pose.pt` downloads automatically on first run. No manual download needed.
 
 5. **Run the backend**
 ```bash
 uvicorn backend.main:app --host 0.0.0.0 --port 8002
 ```
 
-The model takes 15-20 seconds to load on first startup. The API is ready when you see `Pose model loaded`.
+The API is ready when you see `Pose model loaded` (takes 15-20 seconds on first startup).
 
 ### Frontend Setup
 
@@ -167,25 +165,19 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 💻 Usage
 
-1. Open the app and upload an exam surveillance video, or select one already on the server
+1. Upload an exam surveillance video or select one from the library
 2. Click **Start Analysis**
-3. Watch the live annotated feed — green skeletons are clean, red are flagged
-4. Monitor the sidebar for per-student flag counts and the live alert feed
-5. When processing finishes, review the session report
-6. Watch or download the annotated output video
-7. Click **New Session** to run again with a different video
+3. Watch the live feed — green skeletons are clean, red are flagged
+4. Monitor the sidebar for per-student flag counts and live alerts
+5. Review the session report when processing finishes
+6. Download the annotated output video
+7. Click **New Session** to run again
 
 ---
 
 ## 📓 Development Notebook
 
-`exameye_dev.ipynb` is a Colab-compatible notebook that walks through the full pipeline cell by cell:
-
-- Load YOLO and inspect raw keypoint output
-- Visualize skeleton overlays on individual frames
-- Test and print detection logic values (ear confidence, nose ratios, eye asymmetry, shoulder angles)
-- Process a full video and download the annotated output
-- Threshold tuning playground — change a value and see how detection count changes across sampled frames
+`exameye_dev.ipynb` is a Colab-compatible notebook covering the full pipeline: load YOLO, inspect raw keypoints, visualize skeletons, test detection logic with printed intermediate values, process a full video, and download the output. Includes a threshold tuning playground.
 
 ---
 
@@ -199,7 +191,7 @@ exam-eye-pose/
 │   ├── detector.py            # YOLO11n-pose inference, ByteTrack tracking
 │   ├── analyzer.py            # Pose analysis rules and StudentTracker class
 │   ├── drawer.py              # Skeleton and overlay drawing
-│   └── bytetrack_exam.yaml    # ByteTrack tuning (thresholds, buffer size)
+│   └── bytetrack_exam.yaml    # ByteTrack configuration
 │
 ├── frontend/
 │   ├── app/
@@ -212,8 +204,8 @@ exam-eye-pose/
 │
 ├── videos/                    # Uploaded source videos
 ├── outputs/                   # Annotated output videos
-├── assets/                    # Screenshots
-├── exameye_dev.ipynb          # Development and prototyping notebook
+├── assets/                    # Screenshots and sample output videos
+├── exameye_dev.ipynb          # Development notebook
 ├── requirements.txt
 └── README.md
 ```
@@ -222,7 +214,7 @@ exam-eye-pose/
 
 ## ⚠️ Disclaimer
 
-Detection accuracy depends on video quality, camera angle, lighting, and how many students are in frame. The system flags behavior geometrically and will miss subtle cheating that does not involve head or body movement. Do not use flags as definitive evidence of cheating without human review.
+Detection accuracy depends on video quality, camera angle, and lighting. The system only flags behavior it can measure geometrically. Do not use flags as definitive evidence of cheating without human review.
 
 ---
 
