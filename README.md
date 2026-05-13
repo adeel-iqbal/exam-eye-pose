@@ -78,10 +78,10 @@ Each flag has a 2-second cooldown per student — one continuous head turn logs 
 
 ## 🎬 Sample Output Videos
 
-GitHub does not support video playback. Download the sample annotated output videos from the links below to see the skeleton overlays, color coding, and overlay stats in action.
+GitHub does not support video playback. Download the sample output videos from the links below.
 
-- [Output.mp4](assets/Output.mp4) — Sample processed video with skeleton overlays and flag annotations
-- [Output2.mp4](assets/Output2.mp4) — Second sample showing multi-student tracking and body turn detection
+- [Output.mp4](assets/Output.mp4) — 2-student session, head turn and body turn flags annotated in real time
+- [Output2.mp4](assets/Output2.mp4) — Same session, different run showing flag timing and skeleton color switching
 
 ---
 
@@ -116,8 +116,8 @@ GitHub does not support video playback. Download the sample annotated output vid
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/adeel-iqbal/exam-eye.git
-cd exam-eye
+git clone https://github.com/adeel-iqbal/exam-eye-pose.git
+cd exam-eye-pose
 ```
 
 2. **Create a virtual environment**
