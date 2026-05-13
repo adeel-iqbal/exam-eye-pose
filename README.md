@@ -230,7 +230,7 @@ Detection accuracy depends on video quality, camera angle, lighting, and how man
 
 **Adeel Iqbal**
 
-- 📧 Email: [ai@rankmeglobal.com](mailto:ai@rankmeglobal.com)
+- 📧 Email: [adeelmemon096@yahoo.com](mailto:adeelmemon096@yahoo.com)
 - 💼 LinkedIn: [linkedin.com/in/adeeliqbalmemon](https://linkedin.com/in/adeeliqbalmemon)
 - 🐙 GitHub: [@adeel-iqbal](https://github.com/adeel-iqbal)
 
